@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="hackathon 2025"
+config/name="Plant"
 run/main_scene="uid://dvskgsyyg3vmj"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
