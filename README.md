@@ -49,13 +49,16 @@ cd build/web && python3 -m http.server 8000
 
 ## Tests
 
-CI checks that the project imports and the Web export succeeds. The bamboo harvest check is a headless Godot script (needs Godot 4.5; run `godot --headless --import` once first on a fresh clone):
+CI imports the project, builds the Web export and runs the headless gameplay tests in `tests/`. `tests/smoke_test.gd` plays the real game scene with a 3-second timer and a fixed RNG seed: placing the first seed starts the run, harvests add seeds, and `game_over` fires exactly once for a win and for a loss. It needs no window and no network. Locally, with Godot 4.5 on your `PATH`:
 
 ```
-godot --headless --path . --script res://tests/bamboo_harvest_test.gd
+tests/run_tests.sh                     # runs every tests/*_test.gd
+godot --headless --path . --script res://tests/smoke_test.gd   # just the smoke test
 ```
 
-It exits with status 1 if a check fails.
+Each test exits with status 1 if a check fails. On a fresh clone run `godot --headless --import` once first (`run_tests.sh` does it for you).
+
+`tests/bamboo_harvest_test.gd` checks that harvesting bamboo grants an extra bamboo seed, as its tooltip says; it runs as part of `tests/run_tests.sh` too.
 
 ## Team and my role
 
