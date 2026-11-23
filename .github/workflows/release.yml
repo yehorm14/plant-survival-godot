@@ -1,0 +1,61 @@
+name: Release desktop builds
+
+# Runs only when a version tag such as v1.0.0 is pushed.
+on:
+  push:
+    tags: ["v*"]
+
+env:
+  GODOT_VERSION: "4.5-stable"
+  GODOT_TEMPLATE_DIR: "4.5.stable"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot and export templates
+        run: |
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}"
+          curl -fsSL -o godot.zip "${base}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          curl -fsSL -o templates.tpz "${base}/Godot_v${GODOT_VERSION}_export_templates.tpz"
+          unzip -q godot.zip
+          sudo mv "Godot_v${GODOT_VERSION}_linux.x86_64" /usr/local/bin/godot
+          mkdir -p "$HOME/.local/share/godot/export_templates"
+          unzip -q templates.tpz -d templates_tmp
+          mv templates_tmp/templates "$HOME/.local/share/godot/export_templates/${GODOT_TEMPLATE_DIR}"
+          rm -rf godot.zip templates.tpz templates_tmp
+
+      - name: Import project
+        run: |
+          godot --headless --import 2>&1 | tee import.log
+          # custom_samplers is a known harmless shader message from outline.gdshader
+          if grep -E "ERROR|Parse Error" import.log | grep -v custom_samplers | grep .; then exit 1; fi
+
+      - name: Export desktop builds
+        run: |
+          mkdir -p build/windows build/linux build/macos dist
+          for preset in "Windows Desktop:build/windows/plant.exe" "Linux:build/linux/plant.x86_64" "macOS:build/macos/plant.zip"; do
+            name="${preset%%:*}"
+            out="${preset#*:}"
+            godot --headless --export-release "$name" "$out" 2>&1 | tee "export.log"
+            if grep -E "ERROR|Parse Error" export.log | grep -v custom_samplers | grep .; then exit 1; fi
+            test -f "$out"
+          done
+
+      - name: Package zips
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          (cd build/windows && zip -q -r "../../dist/plant-${tag}-windows.zip" .)
+          (cd build/linux && zip -q -r "../../dist/plant-${tag}-linux.zip" .)
+          cp build/macos/plant.zip "dist/plant-${tag}-macos.zip"
+          ls -l dist
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
