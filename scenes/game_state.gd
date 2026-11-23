@@ -207,17 +207,22 @@ func can_place_at(tile_pos: Vector2):
 		
 	return false
 	
-# Shared by plants and the placement hint. The ActiveLayer tile (water, rock)
-# overrides the BackgroundLayer tile (grass, craters) when both are present.
+# Effective terrain at a tile: the ActiveLayer tile (water, rock) overrides the
+# BackgroundLayer tile (grass, craters) when both are present. Returns the
+# TILE_DATA entry, or null for tiles outside the map or with unknown art.
+func effective_tile_info(tile_pos: Vector2i):
+	var coords := bgLayer.get_cell_atlas_coords(tile_pos)
+	if activeLayer.get_cell_source_id(tile_pos) != -1:
+		coords = activeLayer.get_cell_atlas_coords(tile_pos)
+	return TILE_DATA.get(coords)
+
+# Shared by plants and the placement hint.
 func scan_nearby_water(tile_pos: Vector2i, water_range: int) -> int:
 	var count := 0
 	for dy in range(-water_range, water_range + 1):
 		for dx in range(-water_range, water_range + 1):
 			var p := tile_pos + Vector2i(dx, dy)
-			var coords := bgLayer.get_cell_atlas_coords(p)
-			if activeLayer.get_cell_source_id(p) != -1:
-				coords = activeLayer.get_cell_atlas_coords(p)
-			var tile_info = TILE_DATA.get(coords)
+			var tile_info = effective_tile_info(p)
 			if tile_info:
 				count += int(tile_info.Water)
 	return count
