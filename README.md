@@ -35,8 +35,14 @@ A 2D strategy game built in Godot 4.5: plant crops and defenders, then keep at l
 ## Tech stack
 
 - Engine: Godot 4.5, GDScript, Compatibility renderer
-- Export: Godot Web template, single-threaded
+- Export: Godot Web template (single-threaded) and Windows, macOS and Linux desktop presets
 - Tooling: GitHub Actions builds the Web export and deploys it to GitHub Pages
+
+## Download
+
+Desktop builds for Windows, macOS and Linux are attached to the repository's [Releases](../../releases) page. A release appears once a version tag (`v*`, for example `v1.0.0`) is pushed: `.github/workflows/release.yml` then exports the three builds and attaches one zip per platform. Until the first `v*` tag is pushed there are no releases to download.
+
+Notes: the builds are not code-signed. On macOS right-click the app and choose **Open** the first time; on Linux run `chmod +x plant.x86_64`.
 
 ## Run locally
 
