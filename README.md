@@ -49,7 +49,14 @@ cd build/web && python3 -m http.server 8000
 
 ## Tests
 
-No automated tests. CI checks that the project imports and the Web export succeeds.
+CI imports the project, builds the Web export and runs the headless gameplay tests in `tests/`. `tests/smoke_test.gd` plays the real game scene with a 3-second timer and a fixed RNG seed: placing the first seed starts the run, harvests add seeds, and `game_over` fires exactly once for a win and for a loss. It needs no window and no network. Locally, with Godot 4.5 on your `PATH`:
+
+```
+tests/run_tests.sh                     # runs every tests/*_test.gd
+godot --headless --path . --script res://tests/smoke_test.gd   # just the smoke test
+```
+
+Each test exits with status 1 if a check fails. On a fresh clone run `godot --headless --import` once first (`run_tests.sh` does it for you).
 
 ## Team and my role
 
