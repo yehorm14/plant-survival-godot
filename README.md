@@ -47,6 +47,12 @@ mkdir -p build/web && godot --headless --export-release "Web" build/web/index.ht
 cd build/web && python3 -m http.server 8000
 ```
 
+## Deploying to GitHub Pages
+
+`.github/workflows/pages.yml` builds the Web export on every push and pull request, and deploys it from `main` (push, or **Actions > Build and deploy web export > Run workflow** on `main`). Pull requests only build.
+
+One-time setup, needs repository admin: **Settings > Pages > Build and deployment > Source: GitHub Actions**. Without it the deploy job fails with `Failed to create deployment (status: 404)` even though the build passes. Once the first deploy succeeds, the game is served at the URL shown on the deploy job and on the repository's Pages settings page (expected: `https://yehorm14.github.io/plant-survival-godot/`).
+
 ## Tests
 
 No automated tests. CI checks that the project imports and the Web export succeeds.
