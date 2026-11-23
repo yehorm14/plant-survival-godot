@@ -14,7 +14,7 @@ A 2D strategy game built in Godot 4.5: plant crops and defenders, then keep at l
 - 10 plants: six producers (sunflower, tomato, potato, carrot, corn, bamboo) and four defenders (white pine, cactus, tropical tree, sakura).
 - Plants grow in stages only with enough water tiles nearby and shrink without it.
 - Five random events: volcano, flooding, tornado, meteorite, storm. They get more frequent over time.
-- A harvest every 5 seconds gives a random seed and score.
+- A harvest every 5 seconds gives a random seed and score. Each fully grown bamboo adds one extra bamboo seed per harvest (it does not add score).
 - Hover over a plant or seed to see its stats and water level.
 - Placement hint shows the water level of a tile before you plant.
 
@@ -49,7 +49,13 @@ cd build/web && python3 -m http.server 8000
 
 ## Tests
 
-No automated tests. CI checks that the project imports and the Web export succeeds.
+CI checks that the project imports and the Web export succeeds. The bamboo harvest check is a headless Godot script (needs Godot 4.5; run `godot --headless --import` once first on a fresh clone):
+
+```
+godot --headless --path . --script res://tests/bamboo_harvest_test.gd
+```
+
+It exits with status 1 if a check fails.
 
 ## Team and my role
 
