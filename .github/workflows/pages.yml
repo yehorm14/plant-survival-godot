@@ -11,6 +11,22 @@ env:
   GODOT_TEMPLATE_DIR: "4.5.stable"
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot
+        run: |
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}"
+          curl -fsSL -o godot.zip "${base}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          unzip -q godot.zip
+          sudo mv "Godot_v${GODOT_VERSION}_linux.x86_64" /usr/local/bin/godot
+          rm godot.zip
+
+      - name: Gameplay smoke tests (headless)
+        run: tests/run_tests.sh
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -49,7 +65,7 @@ jobs:
   deploy:
     # Pull requests only build. Pushes to main and manual runs from main deploy.
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: build
+    needs: [build, test]
     runs-on: ubuntu-latest
     # One deployment at a time.
     concurrency:

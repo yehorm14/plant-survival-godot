@@ -95,9 +95,12 @@ func _give_random_seed():
 		var idx = _pick_weighted_index()
 		_increment_inventory_slot(idx, 1)
 
-	var bonus = _extra_bamboo_from_producers()
+	# Bamboo's reward is extra bamboo seeds in the inventory (see bamboo.tscn
+	# item_description), not score.
+	_increment_inventory_slot(_bamboo_inventory_index(), _extra_bamboo_from_producers())
+
 	var harvest_score = _harvest_multiplier() + (10 * _sakura_trees_count())
-	score += harvest_score + bonus
+	score += harvest_score
 
 func _pick_weighted_index():
 	var n = INVENTORY_SLOT_ITEMS.size()
@@ -402,7 +405,7 @@ func _update_score_stuff():
 	if mult > 0: 
 		lines.append("+(%d) SCORE PER HARVEST" % mult)
 	if bamboo_bonus > 0: 
-		lines.append("+(%d) BAMBOO SCORE PER HARVEST" % bamboo_bonus)
+		lines.append("+(%d) BAMBOO SEED%s PER HARVEST" % [bamboo_bonus, "" if bamboo_bonus == 1 else "S"])
 	if sakura_trees > 0: 
 		lines.append("+(%d) SAKURA HARVEST MULTIPLIER" % sakura_trees)
 

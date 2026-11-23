@@ -14,7 +14,7 @@ A 2D strategy game built in Godot 4.5: plant crops and defenders, then keep at l
 - 10 plants: six producers (sunflower, tomato, potato, carrot, corn, bamboo) and four defenders (white pine, cactus, tropical tree, sakura).
 - Plants grow in stages only with enough water tiles nearby and shrink without it.
 - Five random events: volcano, flooding, tornado, meteorite, storm. They get more frequent over time.
-- A harvest every 5 seconds gives a random seed and score.
+- A harvest every 5 seconds gives a random seed and score. Each fully grown bamboo adds one extra bamboo seed per harvest (it does not add score).
 - Hover over a plant or seed to see its stats and water level.
 - Placement hint shows the water level of a tile before you plant.
 
@@ -55,7 +55,16 @@ One-time setup, needs repository admin: **Settings > Pages > Build and deploymen
 
 ## Tests
 
-No automated tests. CI checks that the project imports and the Web export succeeds.
+CI imports the project, builds the Web export and runs the headless gameplay tests in `tests/`. `tests/smoke_test.gd` plays the real game scene with a 3-second timer and a fixed RNG seed: placing the first seed starts the run, harvests add seeds, and `game_over` fires exactly once for a win and for a loss. It needs no window and no network. Locally, with Godot 4.5 on your `PATH`:
+
+```
+tests/run_tests.sh                     # runs every tests/*_test.gd
+godot --headless --path . --script res://tests/smoke_test.gd   # just the smoke test
+```
+
+Each test exits with status 1 if a check fails. On a fresh clone run `godot --headless --import` once first (`run_tests.sh` does it for you).
+
+`tests/bamboo_harvest_test.gd` checks that harvesting bamboo grants an extra bamboo seed, as its tooltip says; it runs as part of `tests/run_tests.sh` too.
 
 ## Team and my role
 
