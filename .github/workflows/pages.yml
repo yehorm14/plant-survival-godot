@@ -63,9 +63,14 @@ jobs:
           path: build/web
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Pull requests only build. Pushes to main and manual runs from main deploy.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: [build, test]
     runs-on: ubuntu-latest
+    # One deployment at a time.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     permissions:
       pages: write
       id-token: write
@@ -73,5 +78,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Fails with a clear message if Pages is not enabled for the repository.
+      # One-time setup: Settings > Pages > Build and deployment > Source: GitHub Actions.
+      - uses: actions/configure-pages@v5
+
       - id: deployment
         uses: actions/deploy-pages@v4

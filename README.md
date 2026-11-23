@@ -47,6 +47,12 @@ mkdir -p build/web && godot --headless --export-release "Web" build/web/index.ht
 cd build/web && python3 -m http.server 8000
 ```
 
+## Deploying to GitHub Pages
+
+`.github/workflows/pages.yml` builds the Web export on every push and pull request, and deploys it from `main` (push, or **Actions > Build and deploy web export > Run workflow** on `main`). Pull requests only build.
+
+One-time setup, needs repository admin: **Settings > Pages > Build and deployment > Source: GitHub Actions**. Without it the deploy job fails with `Failed to create deployment (status: 404)` even though the build passes. Once the first deploy succeeds, the game is served at the URL shown on the deploy job and on the repository's Pages settings page (expected: `https://yehorm14.github.io/plant-survival-godot/`).
+
 ## Tests
 
 CI imports the project, builds the Web export and runs the headless gameplay tests in `tests/`. `tests/smoke_test.gd` plays the real game scene with a 3-second timer and a fixed RNG seed: placing the first seed starts the run, harvests add seeds, and `game_over` fires exactly once for a win and for a loss. It needs no window and no network. Locally, with Godot 4.5 on your `PATH`:
