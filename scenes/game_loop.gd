@@ -216,8 +216,7 @@ func _rect_placeable(tl, w, h):
 	for yy in range(h):
 		for xx in range(w):
 			var p = tl + Vector2i(xx, yy)
-			var atlas = _active_layer.get_cell_atlas_coords(p)
-			var info = TILE_DATA.get(atlas)
+			var info = gs.effective_tile_info(p)
 			if not info or not info.Placeable:
 				return false
 	return true
@@ -287,8 +286,7 @@ func _on_event_flooding():
 		tw.chain().tween_callback(func():
 			if _tile_has_plant(tile):
 				a.queue_free(); return
-			var atlas = _active_layer.get_cell_atlas_coords(tile)
-			var info = TILE_DATA.get(atlas)
+			var info = gs.effective_tile_info(tile)
 			if info and info.Name == "Water":
 				_spread_water_from(tile, 1)
 			a.queue_free()
@@ -319,8 +317,7 @@ func _spread_water_from(start: Vector2i, steps: int):
 				if seen.has(n): continue
 				var plant = _tile_has_plant(n)
 				if plant: plant.queue_free()
-				var atlas = _active_layer.get_cell_atlas_coords(n)
-				var info = TILE_DATA.get(atlas)
+				var info = gs.effective_tile_info(n)
 				if info and info.Placeable and info.Name != "Water":
 					_active_layer.set_cell(n, 0, WATER, 0)
 					nxt.append(n)
